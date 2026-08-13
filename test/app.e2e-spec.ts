@@ -16,11 +16,26 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/ (GET) returns Vietnamese by default', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('Chào mừng đến với Medium News!');
+  });
+
+  it('/?lang=en (GET) returns English', () => {
+    return request(app.getHttpServer())
+      .get('/?lang=en')
+      .expect(200)
+      .expect('Welcome to Medium News!');
+  });
+
+  it('/ (GET) resolves the x-lang header', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .set('x-lang', 'en')
+      .expect(200)
+      .expect('Welcome to Medium News!');
   });
 
   afterEach(async () => {

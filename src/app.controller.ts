@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { I18n, I18nContext } from 'nestjs-i18n';
 import { AppService } from './app.service';
 
 @ApiTags('App')
@@ -10,13 +11,13 @@ export class AppController {
   @Get()
   @ApiOperation({ summary: 'Check the API status' })
   @ApiOkResponse({
-    description: 'The API is running',
+    description: 'Localized message confirming that the API is running',
     schema: {
       type: 'string',
-      example: 'Hello World!',
+      example: 'Chào mừng đến với Medium News!',
     },
   })
-  getHello(): string {
-    return this.appService.getHello();
+  getHello(@I18n() i18n: I18nContext): Promise<string> {
+    return this.appService.getHello(i18n);
   }
 }
