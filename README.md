@@ -50,6 +50,22 @@ $ yarn db:migrate
 Applied migration names and checksums are recorded in `schema_migrations`.
 Never edit an applied migration; create a new numbered SQL file instead.
 
+## Authentication
+
+Authentication follows the project's API contract:
+
+```text
+POST /api/users
+POST /api/users/login
+GET  /api/user
+```
+
+Protected requests use the following header format:
+
+```text
+Authorization: Token <jwt>
+```
+
 ## Compile and run the project
 
 ```bash

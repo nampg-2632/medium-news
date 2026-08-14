@@ -1,0 +1,87 @@
+import {
+  Injectable,
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { hash, verify } from 'argon2';
+import { createCustomError } from '../common/errors/custom-error';
+import { UserRecord } from '../users/user.types';
+import { UserAlreadyExistsError } from '../users/users.errors';
+import { UsersRepository } from '../users/users.repository';
+import { AuthenticatedUser, JwtPayload, UserResponse } from './auth.types';
+import { LoginDto } from './dto/login.dto';
+import { SignupDto } from './dto/signup.dto';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async signup(dto: SignupDto): Promise<UserResponse> {
+    const email = dto.user.email.trim().toLowerCase();
+    const username = dto.user.username.trim();
+    const passwordHash = await hash(dto.user.password);
+
+    try {
+      const user = await this.usersRepository.create({
+        email,
+        username,
+        passwordHash,
+      });
+      return this.createUserResponse(user);
+    } catch (error) {
+      if (error instanceof UserAlreadyExistsError) {
+        throw new UnprocessableEntityException(
+          createCustomError(`${error.field} has already been taken`),
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  async login(dto: LoginDto): Promise<UserResponse> {
+    const email = dto.user.email.trim().toLowerCase();
+    const user = await this.usersRepository.findByEmail(email);
+
+    if (!user || !(await verify(user.passwordHash, dto.user.password))) {
+      throw new UnauthorizedException(
+        createCustomError('email or password is invalid'),
+      );
+    }
+
+    return this.createUserResponse(user);
+  }
+
+  getCurrentUser(authenticatedUser: AuthenticatedUser): UserResponse {
+    return this.mapUserResponse(
+      authenticatedUser.user,
+      authenticatedUser.token,
+    );
+  }
+
+  private async createUserResponse(user: UserRecord): Promise<UserResponse> {
+    const payload: JwtPayload = {
+      sub: user.id,
+      username: user.username,
+    };
+    const token = await this.jwtService.signAsync(payload);
+
+    return this.mapUserResponse(user, token);
+  }
+
+  private mapUserResponse(user: UserRecord, token: string): UserResponse {
+    return {
+      user: {
+        email: user.email,
+        token,
+        username: user.username,
+        bio: user.bio,
+        image: user.image,
+      },
+    };
+  }
+}

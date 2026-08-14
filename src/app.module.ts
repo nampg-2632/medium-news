@@ -9,6 +9,7 @@ import {
 } from 'nestjs-i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { DatabaseModule } from './database/database.module';
       envFilePath: ['.env.local', '.env'],
     }),
     DatabaseModule,
+    AuthModule,
     I18nModule.forRoot({
       fallbackLanguage: 'vi',
       fallbacks: {
