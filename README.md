@@ -31,6 +31,25 @@
 $ yarn install
 ```
 
+Copy the local environment template if `.env` does not exist:
+
+```bash
+$ cp .env.example .env
+```
+
+## Database
+
+The application uses PostgreSQL through the `pg` driver. Database changes are
+stored as ordered SQL files in `database/migrations` and are only applied when
+the migration command is run:
+
+```bash
+$ yarn db:migrate
+```
+
+Applied migration names and checksums are recorded in `schema_migrations`.
+Never edit an applied migration; create a new numbered SQL file instead.
+
 ## Compile and run the project
 
 ```bash
