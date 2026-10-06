@@ -13,13 +13,15 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SignupUserDto {
   @ApiProperty({ example: 'user' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsString({ message: 'username must be a string' })
   @Length(1, 50, { message: 'username must be between 1 and 50 characters' })
   username!: string;
 
   @ApiProperty({ example: 'user@example.com' })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   @IsEmail({}, { message: 'email must be a valid email' })

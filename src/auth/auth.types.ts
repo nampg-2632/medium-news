@@ -1,4 +1,4 @@
-import { UserRecord } from '../users/user.types';
+import { UserEntity } from '../users/user.entity';
 
 export type JwtPayload = {
   sub: string;
@@ -6,7 +6,7 @@ export type JwtPayload = {
 };
 
 export type AuthenticatedUser = {
-  user: UserRecord;
+  user: UserEntity;
   token: string;
 };
 

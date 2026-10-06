@@ -39,16 +39,22 @@ $ cp .env.example .env
 
 ## Database
 
-The application uses PostgreSQL through the `pg` driver. Database changes are
-stored as ordered SQL files in `database/migrations` and are only applied when
-the migration command is run:
+The application uses PostgreSQL through TypeORM. Entity synchronization is
+disabled; database changes are applied only through TypeORM migrations:
 
 ```bash
 $ yarn db:migrate
 ```
 
-Applied migration names and checksums are recorded in `schema_migrations`.
-Never edit an applied migration; create a new numbered SQL file instead.
+Applied migrations are recorded in `typeorm_migrations`. Never edit an applied
+migration; create a new TypeORM migration instead.
+
+Inspect or revert migrations with:
+
+```bash
+$ yarn db:migration:show
+$ yarn db:migrate:revert
+```
 
 ## Authentication
 

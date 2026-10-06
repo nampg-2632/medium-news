@@ -11,7 +11,7 @@ import {
 
 export class LoginUserDto {
   @ApiProperty({ example: 'user@example.com' })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   @IsEmail({}, { message: 'email must be a valid email' })

@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { hash, verify } from 'argon2';
 import { createCustomError } from '../common/errors/custom-error';
-import { UserRecord } from '../users/user.types';
+import { UserEntity } from '../users/user.entity';
 import { UserAlreadyExistsError } from '../users/users.errors';
 import { UsersRepository } from '../users/users.repository';
 import { AuthenticatedUser, JwtPayload, UserResponse } from './auth.types';
@@ -63,7 +63,7 @@ export class AuthService {
     );
   }
 
-  private async createUserResponse(user: UserRecord): Promise<UserResponse> {
+  private async createUserResponse(user: UserEntity): Promise<UserResponse> {
     const payload: JwtPayload = {
       sub: user.id,
       username: user.username,
@@ -73,7 +73,7 @@ export class AuthService {
     return this.mapUserResponse(user, token);
   }
 
-  private mapUserResponse(user: UserRecord, token: string): UserResponse {
+  private mapUserResponse(user: UserEntity, token: string): UserResponse {
     return {
       user: {
         email: user.email,
