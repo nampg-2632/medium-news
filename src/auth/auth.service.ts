@@ -12,12 +12,14 @@ import { UsersRepository } from '../users/users.repository';
 import { AuthenticatedUser, JwtPayload, UserResponse } from './auth.types';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
+import { TokenBlacklistService } from './token-blacklist.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly tokenBlacklistService: TokenBlacklistService,
   ) {}
 
   async signup(dto: SignupDto): Promise<UserResponse> {
@@ -60,6 +62,13 @@ export class AuthService {
     return this.mapUserResponse(
       authenticatedUser.user,
       authenticatedUser.token,
+    );
+  }
+
+  async logout(authenticatedUser: AuthenticatedUser): Promise<void> {
+    await this.tokenBlacklistService.revoke(
+      authenticatedUser.token,
+      authenticatedUser.tokenExpiresAt,
     );
   }
 

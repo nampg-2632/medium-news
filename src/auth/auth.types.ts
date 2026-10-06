@@ -5,9 +5,15 @@ export type JwtPayload = {
   username: string;
 };
 
+export type VerifiedJwtPayload = JwtPayload & {
+  exp: number;
+  iat: number;
+};
+
 export type AuthenticatedUser = {
   user: UserEntity;
   token: string;
+  tokenExpiresAt: number;
 };
 
 export type UserResponse = {

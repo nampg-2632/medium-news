@@ -56,6 +56,19 @@ $ yarn db:migration:show
 $ yarn db:migrate:revert
 ```
 
+## Redis
+
+Redis is required to revoke JWTs immediately after logout. On macOS, install
+and start it with:
+
+```bash
+$ brew install redis
+$ brew services start redis
+$ redis-cli ping
+```
+
+The expected health-check response is `PONG`.
+
 ## Authentication
 
 Authentication follows the project's API contract:
@@ -64,6 +77,7 @@ Authentication follows the project's API contract:
 POST /api/users
 POST /api/users/login
 GET  /api/user
+POST /api/users/logout
 ```
 
 Protected requests use the following header format:
@@ -71,6 +85,9 @@ Protected requests use the following header format:
 ```text
 Authorization: Token <jwt>
 ```
+
+Logout stores a SHA-256 fingerprint of the JWT in Redis until the token expires.
+The raw token is never stored in Redis.
 
 ## Compile and run the project
 

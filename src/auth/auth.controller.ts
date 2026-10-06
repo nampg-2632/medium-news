@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiSecurity,
@@ -65,5 +66,19 @@ export class AuthController {
     @CurrentUser() authenticatedUser: AuthenticatedUser,
   ): UserResponse {
     return this.authService.getCurrentUser(authenticatedUser);
+  }
+
+  @Post('users/logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({ summary: 'Log out and revoke the current token' })
+  @ApiNoContentResponse({ description: 'Token revoked successfully' })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @PreventCaching()
+  async logout(
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<void> {
+    await this.authService.logout(authenticatedUser);
   }
 }

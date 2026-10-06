@@ -6,6 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { createCustomError } from '../../common/errors/custom-error';
 import { UsersRepository } from '../../users/users.repository';
 import { AuthenticatedUser, JwtPayload } from '../auth.types';
+import { TokenBlacklistService } from '../token-blacklist.service';
 
 const tokenExtractor = ExtractJwt.fromAuthHeaderWithScheme('Token');
 
@@ -14,6 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
     private readonly usersRepository: UsersRepository,
+    private readonly tokenBlacklistService: TokenBlacklistService,
   ) {
     super({
       jwtFromRequest: tokenExtractor,
@@ -25,23 +27,34 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(
     request: Request,
-    payload: JwtPayload,
+    payload: JwtPayload & { exp?: unknown; iat?: unknown },
   ): Promise<AuthenticatedUser> {
-    if (typeof payload.sub !== 'string') {
+    if (
+      typeof payload.sub !== 'string' ||
+      typeof payload.exp !== 'number' ||
+      typeof payload.iat !== 'number'
+    ) {
+      throw new UnauthorizedException(
+        createCustomError('authentication token is invalid'),
+      );
+    }
+
+    const token = tokenExtractor(request);
+
+    if (!token || (await this.tokenBlacklistService.isRevoked(token))) {
       throw new UnauthorizedException(
         createCustomError('authentication token is invalid'),
       );
     }
 
     const user = await this.usersRepository.findById(payload.sub);
-    const token = tokenExtractor(request);
 
-    if (!user || !token) {
+    if (!user) {
       throw new UnauthorizedException(
         createCustomError('authentication token is invalid'),
       );
     }
 
-    return { user, token };
+    return { user, token, tokenExpiresAt: payload.exp };
   }
 }
