@@ -9,7 +9,7 @@ import { createCustomError } from '../common/errors/custom-error';
 import { UserEntity } from '../users/user.entity';
 import { UserAlreadyExistsError } from '../users/users.errors';
 import { UsersRepository } from '../users/users.repository';
-import { AuthenticatedUser, JwtPayload, UserResponse } from './auth.types';
+import { AuthenticatedUser, AuthResponse, JwtPayload } from './auth.types';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { TokenBlacklistService } from './token-blacklist.service';
@@ -22,7 +22,7 @@ export class AuthService {
     private readonly tokenBlacklistService: TokenBlacklistService,
   ) {}
 
-  async signup(dto: SignupDto): Promise<UserResponse> {
+  async signup(dto: SignupDto): Promise<AuthResponse> {
     const email = dto.user.email.trim().toLowerCase();
     const username = dto.user.username.trim();
     const passwordHash = await hash(dto.user.password);
@@ -33,7 +33,7 @@ export class AuthService {
         username,
         passwordHash,
       });
-      return this.createUserResponse(user);
+      return this.createAuthResponse(user);
     } catch (error) {
       if (error instanceof UserAlreadyExistsError) {
         throw new UnprocessableEntityException(
@@ -45,7 +45,7 @@ export class AuthService {
     }
   }
 
-  async login(dto: LoginDto): Promise<UserResponse> {
+  async login(dto: LoginDto): Promise<AuthResponse> {
     const email = dto.user.email.trim().toLowerCase();
     const user = await this.usersRepository.findByEmail(email);
 
@@ -55,14 +55,7 @@ export class AuthService {
       );
     }
 
-    return this.createUserResponse(user);
-  }
-
-  getCurrentUser(authenticatedUser: AuthenticatedUser): UserResponse {
-    return this.mapUserResponse(
-      authenticatedUser.user,
-      authenticatedUser.token,
-    );
+    return this.createAuthResponse(user);
   }
 
   async logout(authenticatedUser: AuthenticatedUser): Promise<void> {
@@ -72,17 +65,17 @@ export class AuthService {
     );
   }
 
-  private async createUserResponse(user: UserEntity): Promise<UserResponse> {
+  private async createAuthResponse(user: UserEntity): Promise<AuthResponse> {
     const payload: JwtPayload = {
       sub: user.id,
       username: user.username,
     };
     const token = await this.jwtService.signAsync(payload);
 
-    return this.mapUserResponse(user, token);
+    return this.mapAuthResponse(user, token);
   }
 
-  private mapUserResponse(user: UserEntity, token: string): UserResponse {
+  private mapAuthResponse(user: UserEntity, token: string): AuthResponse {
     return {
       user: {
         email: user.email,

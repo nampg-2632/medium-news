@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AuthUserDto {
+export class AuthenticatedUserDto {
   @ApiProperty({ example: 'user@example.com' })
   email!: string;
 
@@ -17,7 +17,7 @@ export class AuthUserDto {
   image!: string | null;
 }
 
-export class UserResponseDto {
-  @ApiProperty({ type: AuthUserDto })
-  user!: AuthUserDto;
+export class AuthResponseDto {
+  @ApiProperty({ type: AuthenticatedUserDto })
+  user!: AuthenticatedUserDto;
 }

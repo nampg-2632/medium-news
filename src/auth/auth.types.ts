@@ -16,7 +16,7 @@ export type AuthenticatedUser = {
   tokenExpiresAt: number;
 };
 
-export type UserResponse = {
+export type AuthResponse = {
   user: {
     email: string;
     token: string;

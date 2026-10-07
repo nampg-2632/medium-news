@@ -74,10 +74,10 @@ The expected health-check response is `PONG`.
 Authentication follows the project's API contract:
 
 ```text
-POST /api/users
-POST /api/users/login
+POST /api/auth/signup
+POST /api/auth/login
 GET  /api/user
-POST /api/users/logout
+POST /api/auth/logout
 ```
 
 Protected requests use the following header format:
