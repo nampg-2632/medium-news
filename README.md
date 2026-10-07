@@ -89,6 +89,23 @@ Authorization: Token <jwt>
 Logout stores a SHA-256 fingerprint of the JWT in Redis until the token expires.
 The raw token is never stored in Redis.
 
+## Users and profiles
+
+```text
+GET    /api/user
+PUT    /api/user                         # partial update: email, username, password, bio
+PUT    /api/user/avatar                  # multipart field "avatar" (JPG/JPEG, PNG, WebP; max 2 MB)
+DELETE /api/user/avatar
+GET    /api/profiles/:username           # authentication optional
+POST   /api/profiles/:username/follow
+DELETE /api/profiles/:username/follow
+```
+
+Uploaded files are stored on local disk under `UPLOAD_DIR` (default
+`storage/uploads`) and served publicly at `/uploads/...`. File metadata lives in
+the polymorphic `attachments` table and `users.avatar_id` references the current
+avatar. Image URLs in responses are built from `APP_URL`.
+
 ## Compile and run the project
 
 ```bash
