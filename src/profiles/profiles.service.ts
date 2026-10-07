@@ -6,6 +6,7 @@ import {
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { createCustomError } from '../common/errors/custom-error';
 import { FollowsRepository } from '../follows/follows.repository';
+import { UserPresenter } from '../users/user.presenter';
 import { UserEntity } from '../users/user.entity';
 import { UsersRepository } from '../users/users.repository';
 import type { ProfileResponse } from './profile.types';
@@ -15,6 +16,7 @@ export class ProfilesService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly followsRepository: FollowsRepository,
+    private readonly userPresenter: UserPresenter,
   ) {}
 
   async getProfile(
@@ -84,7 +86,7 @@ export class ProfilesService {
       profile: {
         username: user.username,
         bio: user.bio,
-        image: user.image,
+        image: this.userPresenter.getImageUrl(user),
         following,
       },
     };

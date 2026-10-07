@@ -1,0 +1,313 @@
+{
+  "info": {
+    "_postman_id": "7a724c0d-1bdc-4f52-9851-fb473ce0756b",
+    "name": "Medium News API",
+    "description": "RealWorld-style API. Run Sign up or Log in first: the token is saved to the {{token}} collection variable and sent as `Authorization: Token <jwt>` on protected requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": "alice@example.com"
+    },
+    {
+      "key": "username",
+      "value": "alice"
+    },
+    {
+      "key": "password",
+      "value": "password123"
+    },
+    {
+      "key": "profileUsername",
+      "value": "bob"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "Token {{token}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().user.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"username\": \"{{username}}\",\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Log in",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().user.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Log out",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update current user",
+          "request": {
+            "description": "Only the provided fields are updated. Send \"bio\": null to clear the bio. Remove any field you do not want to change.",
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"bio\": \"Backend developer\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload avatar",
+          "request": {
+            "description": "multipart/form-data, field \"avatar\": JPG/JPEG, PNG or WebP, at most 2 MB. Pick the file in the Body tab. Replaces the current avatar.",
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "avatar",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/avatar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "avatar"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove avatar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/avatar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "avatar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profiles",
+      "item": [
+        {
+          "name": "Get profile",
+          "request": {
+            "description": "Authentication is optional. Without a token, following is always false. Set the collection auth to No Auth to try it anonymously.",
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{profileUsername}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "{{profileUsername}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Follow user",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{profileUsername}}/follow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "{{profileUsername}}",
+                "follow"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unfollow user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/{{profileUsername}}/follow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "{{profileUsername}}",
+                "follow"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

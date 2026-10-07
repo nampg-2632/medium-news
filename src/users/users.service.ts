@@ -7,17 +7,20 @@ import { hash } from 'argon2';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { createCustomError } from '../common/errors/custom-error';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './user.entity';
+import { UserPresenter } from './user.presenter';
 import type { UpdateUserInput, UserResponse } from './user.types';
 import { UserAlreadyExistsError } from './users.errors';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly userPresenter: UserPresenter,
+  ) {}
 
   getCurrentUser(authenticatedUser: AuthenticatedUser): UserResponse {
-    return this.toUserResponse(authenticatedUser.user);
+    return this.userPresenter.toUserResponse(authenticatedUser.user);
   }
 
   async updateCurrentUser(
@@ -59,17 +62,6 @@ export class UsersService {
       throw new NotFoundException(createCustomError('user not found'));
     }
 
-    return this.toUserResponse(user);
-  }
-
-  private toUserResponse(user: UserEntity): UserResponse {
-    return {
-      user: {
-        email: user.email,
-        username: user.username,
-        bio: user.bio,
-        image: user.image,
-      },
-    };
+    return this.userPresenter.toUserResponse(user);
   }
 }

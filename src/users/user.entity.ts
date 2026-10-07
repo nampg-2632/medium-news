@@ -2,12 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { ArticleEntity } from '../articles/article.entity';
+import { AttachmentEntity } from '../attachments/attachment.entity';
 import { CommentEntity } from '../comments/comment.entity';
 import { FavoriteEntity } from '../favorites/favorite.entity';
 import { FollowEntity } from '../follows/follow.entity';
@@ -29,8 +32,12 @@ export class UserEntity {
   @Column({ type: 'text', nullable: true })
   bio!: string | null;
 
-  @Column({ type: 'text', nullable: true })
-  image!: string | null;
+  @Column({ name: 'avatar_id', type: 'uuid', nullable: true })
+  avatarId!: string | null;
+
+  @ManyToOne(() => AttachmentEntity, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'avatar_id' })
+  avatar!: Relation<AttachmentEntity> | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;

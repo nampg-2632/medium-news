@@ -62,6 +62,7 @@ export class UsersRepository {
   findByEmail(email: string): Promise<UserEntity | null> {
     return this.repository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
       .where('LOWER(user.email) = LOWER(:email)', { email })
       .getOne();
   }
@@ -69,11 +70,15 @@ export class UsersRepository {
   findByUsername(username: string): Promise<UserEntity | null> {
     return this.repository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.avatar', 'avatar')
       .where('LOWER(user.username) = LOWER(:username)', { username })
       .getOne();
   }
 
   findById(id: string): Promise<UserEntity | null> {
-    return this.repository.findOne({ where: { id } });
+    return this.repository.findOne({
+      where: { id },
+      relations: { avatar: true },
+    });
   }
 }
