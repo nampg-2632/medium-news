@@ -48,6 +48,13 @@ export class UsersRepository {
       .getOne();
   }
 
+  findByUsername(username: string): Promise<UserEntity | null> {
+    return this.repository
+      .createQueryBuilder('user')
+      .where('LOWER(user.username) = LOWER(:username)', { username })
+      .getOne();
+  }
+
   findById(id: string): Promise<UserEntity | null> {
     return this.repository.findOne({ where: { id } });
   }
