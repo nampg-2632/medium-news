@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { CreateUserInput } from './user.types';
+import { CreateUserInput, UpdateUserInput } from './user.types';
 import { UserAlreadyExistsError } from './users.errors';
 
 const POSTGRES_UNIQUE_VIOLATION_CODE = '23505';
@@ -11,6 +11,25 @@ type PostgresDriverError = Error & {
   code?: string;
   constraint?: string;
 };
+
+// Maps a unique-index violation on email/username to a domain error; any
+// other error is returned unchanged so the caller can rethrow it.
+function toUserAlreadyExistsError(error: unknown): unknown {
+  if (!(error instanceof QueryFailedError)) {
+    return error;
+  }
+
+  const driverError = error.driverError as PostgresDriverError;
+
+  if (driverError.code !== POSTGRES_UNIQUE_VIOLATION_CODE) {
+    return error;
+  }
+
+  const conflictingField = driverError.constraint?.includes('email')
+    ? 'email'
+    : 'username';
+  return new UserAlreadyExistsError(conflictingField);
+}
 
 @Injectable()
 export class UsersRepository {
@@ -24,20 +43,19 @@ export class UsersRepository {
       const user = this.repository.create(input);
       return await this.repository.save(user);
     } catch (error) {
-      if (error instanceof QueryFailedError) {
-        const driverError = error.driverError as PostgresDriverError;
+      throw toUserAlreadyExistsError(error);
+    }
+  }
 
-        if (driverError.code !== POSTGRES_UNIQUE_VIOLATION_CODE) {
-          throw error;
-        }
+  async update(id: string, input: UpdateUserInput): Promise<void> {
+    if (Object.keys(input).length === 0) {
+      return;
+    }
 
-        const conflictingField = driverError.constraint?.includes('email')
-          ? 'email'
-          : 'username';
-        throw new UserAlreadyExistsError(conflictingField);
-      }
-
-      throw error;
+    try {
+      await this.repository.update({ id }, input);
+    } catch (error) {
+      throw toUserAlreadyExistsError(error);
     }
   }
 
