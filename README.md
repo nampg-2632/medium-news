@@ -31,6 +31,64 @@
 $ yarn install
 ```
 
+Copy the local environment template if `.env` does not exist:
+
+```bash
+$ cp .env.example .env
+```
+
+## Database
+
+The application uses PostgreSQL through TypeORM. Entity synchronization is
+disabled; database changes are applied only through TypeORM migrations:
+
+```bash
+$ yarn db:migrate
+```
+
+Applied migrations are recorded in `typeorm_migrations`. Never edit an applied
+migration; create a new TypeORM migration instead.
+
+Inspect or revert migrations with:
+
+```bash
+$ yarn db:migration:show
+$ yarn db:migrate:revert
+```
+
+## Redis
+
+Redis is required to revoke JWTs immediately after logout. On macOS, install
+and start it with:
+
+```bash
+$ brew install redis
+$ brew services start redis
+$ redis-cli ping
+```
+
+The expected health-check response is `PONG`.
+
+## Authentication
+
+Authentication follows the project's API contract:
+
+```text
+POST /api/auth/signup
+POST /api/auth/login
+GET  /api/user
+POST /api/auth/logout
+```
+
+Protected requests use the following header format:
+
+```text
+Authorization: Token <jwt>
+```
+
+Logout stores a SHA-256 fingerprint of the JWT in Redis until the token expires.
+The raw token is never stored in Redis.
+
 ## Compile and run the project
 
 ```bash
