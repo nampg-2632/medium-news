@@ -17,6 +17,21 @@ export class ProfilesService {
     private readonly followsRepository: FollowsRepository,
   ) {}
 
+  async getProfile(
+    username: string,
+    authenticatedUser: AuthenticatedUser | undefined,
+  ): Promise<ProfileResponse> {
+    const profileUser = await this.findProfileUser(username);
+    const following = authenticatedUser
+      ? await this.followsRepository.isFollowing(
+          authenticatedUser.user.id,
+          profileUser.id,
+        )
+      : false;
+
+    return this.toProfileResponse(profileUser, following);
+  }
+
   async follow(
     username: string,
     authenticatedUser: AuthenticatedUser,

@@ -24,4 +24,8 @@ export class FollowsRepository {
   async unfollow(followerId: string, followingId: string): Promise<void> {
     await this.repository.delete({ followerId, followingId });
   }
+
+  isFollowing(followerId: string, followingId: string): Promise<boolean> {
+    return this.repository.existsBy({ followerId, followingId });
+  }
 }

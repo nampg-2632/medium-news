@@ -1,6 +1,7 @@
 import {
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -20,6 +21,7 @@ import type { AuthenticatedUser } from '../auth/auth.types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PreventCaching } from '../auth/decorators/prevent-caching.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { ProfileResponseDto } from './dto/profile-response.dto';
 import type { ProfileResponse } from './profile.types';
 import { ProfilesService } from './profiles.service';
@@ -28,6 +30,25 @@ import { ProfilesService } from './profiles.service';
 @Controller('profiles/:username')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
+
+  @Get()
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({
+    summary: 'Get a profile',
+    description:
+      'Authentication is optional; when provided it is used to compute following.',
+  })
+  @ApiOkResponse({ type: ProfileResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Provided token is invalid' })
+  @ApiNotFoundResponse({ description: 'Profile not found' })
+  @PreventCaching()
+  getProfile(
+    @Param('username') username: string,
+    @CurrentUser() authenticatedUser: AuthenticatedUser | undefined,
+  ): Promise<ProfileResponse> {
+    return this.profilesService.getProfile(username, authenticatedUser);
+  }
 
   @Post('follow')
   @HttpCode(HttpStatus.OK)
