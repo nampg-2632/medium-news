@@ -1,5 +1,16 @@
 import type { ProfileResponse } from '../profiles/profile.types';
 
+export type ArticleFilters = {
+  tag?: string;
+  author?: string;
+  favorited?: string;
+};
+
+export type Pagination = {
+  limit: number;
+  offset: number;
+};
+
 export type CreateArticleInput = {
   slug: string;
   title: string;
@@ -25,4 +36,9 @@ export type ArticleListItem = Omit<ArticleData, 'body'>;
 
 export type ArticleResponse = {
   article: ArticleData;
+};
+
+export type MultipleArticlesResponse = {
+  articles: ArticleListItem[];
+  articlesCount: number;
 };

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { ProfileDto } from '../../profiles/dto/profile-response.dto';
 
 export class ArticleDto {
@@ -33,7 +33,17 @@ export class ArticleDto {
   author!: ProfileDto;
 }
 
+export class ArticleListItemDto extends OmitType(ArticleDto, ['body']) {}
+
 export class ArticleResponseDto {
   @ApiProperty({ type: ArticleDto })
   article!: ArticleDto;
+}
+
+export class MultipleArticlesResponseDto {
+  @ApiProperty({ type: [ArticleListItemDto] })
+  articles!: ArticleListItemDto[];
+
+  @ApiProperty({ example: 1 })
+  articlesCount!: number;
 }

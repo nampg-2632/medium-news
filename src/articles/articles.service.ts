@@ -6,10 +6,16 @@ import { FollowsRepository } from '../follows/follows.repository';
 import { ArticleEntity } from './article.entity';
 import { ArticlePresenter, ArticleViewerState } from './article.presenter';
 import { slugify, withRandomSuffix } from './article-slug';
-import type { ArticleResponse } from './article.types';
+import type {
+  ArticleFilters,
+  ArticleResponse,
+  MultipleArticlesResponse,
+  Pagination,
+} from './article.types';
 import { ArticleSlugTakenError } from './articles.errors';
 import { ArticlesRepository } from './articles.repository';
 import { CreateArticleDto } from './dto/create-article.dto';
+import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
 
 // Retries after a concurrent request claims the same slug first.
 const MAX_SLUG_ATTEMPTS = 3;
@@ -22,6 +28,19 @@ export class ArticlesService {
     private readonly followsRepository: FollowsRepository,
     private readonly articlePresenter: ArticlePresenter,
   ) {}
+
+  listArticles(
+    query: ListArticlesQueryDto,
+    viewer: AuthenticatedUser | undefined,
+  ): Promise<MultipleArticlesResponse> {
+    const { tag, author, favorited, limit, offset } = query;
+
+    return this.findArticles(
+      { tag, author, favorited },
+      { limit, offset },
+      viewer,
+    );
+  }
 
   async getArticle(
     slug: string,
@@ -46,6 +65,25 @@ export class ArticlesService {
     });
 
     return this.getArticle(slug, viewer);
+  }
+
+  private async findArticles(
+    filters: ArticleFilters,
+    pagination: Pagination,
+    viewer: AuthenticatedUser | undefined,
+  ): Promise<MultipleArticlesResponse> {
+    const [articles, articlesCount] = await this.articlesRepository.findPage(
+      filters,
+      pagination,
+    );
+    const states = await this.loadViewerStates(articles, viewer);
+
+    return {
+      articles: articles.map((article, index) =>
+        this.articlePresenter.toArticleListItem(article, states[index]),
+      ),
+      articlesCount,
+    };
   }
 
   private async toArticleResponse(

@@ -4,7 +4,11 @@ import { EntityManager, In, QueryFailedError, Repository } from 'typeorm';
 import { ArticleTagEntity } from '../tags/article-tag.entity';
 import { TagEntity } from '../tags/tag.entity';
 import { ArticleEntity } from './article.entity';
-import type { CreateArticleInput } from './article.types';
+import type {
+  ArticleFilters,
+  CreateArticleInput,
+  Pagination,
+} from './article.types';
 import { ArticleSlugTakenError } from './articles.errors';
 
 const POSTGRES_UNIQUE_VIOLATION_CODE = '23505';
@@ -66,6 +70,66 @@ export class ArticlesRepository {
       .addSelect(['avatar.id', 'avatar.url'])
       .where('article.slug = :slug', { slug })
       .getOne();
+  }
+
+  // The body is not selected because list responses do not include it.
+  async findPage(
+    filters: ArticleFilters,
+    pagination: Pagination,
+  ): Promise<[ArticleEntity[], number]> {
+    const query = this.repository
+      .createQueryBuilder('article')
+      .select([
+        'article.id',
+        'article.slug',
+        'article.title',
+        'article.description',
+        'article.authorId',
+        'article.createdAt',
+        'article.updatedAt',
+      ])
+      .innerJoin('article.author', 'author')
+      .addSelect(['author.id', 'author.username', 'author.bio'])
+      .leftJoin('author.avatar', 'avatar')
+      .addSelect(['avatar.id', 'avatar.url']);
+
+    if (filters.tag !== undefined) {
+      query.andWhere(
+        `EXISTS (
+          SELECT 1 FROM article_tags article_tag
+          INNER JOIN tags tag ON tag.id = article_tag.tag_id
+          WHERE article_tag.article_id = article.id AND tag.name = :tag
+        )`,
+        { tag: filters.tag },
+      );
+    }
+
+    if (filters.author !== undefined) {
+      query.andWhere('LOWER(author.username) = LOWER(:author)', {
+        author: filters.author,
+      });
+    }
+
+    if (filters.favorited !== undefined) {
+      query.andWhere(
+        `EXISTS (
+          SELECT 1 FROM favorites favorite
+          INNER JOIN users favorited_by ON favorited_by.id = favorite.user_id
+          WHERE favorite.article_id = article.id
+            AND LOWER(favorited_by.username) = LOWER(:favorited)
+        )`,
+        { favorited: filters.favorited },
+      );
+    }
+
+    // Only many-to-one relations are joined, so offset/limit apply to
+    // articles directly without duplicating rows.
+    return query
+      .orderBy('article.createdAt', 'DESC')
+      .addOrderBy('article.id', 'DESC')
+      .offset(pagination.offset)
+      .limit(pagination.limit)
+      .getManyAndCount();
   }
 
   async findTagNamesByArticleIds(

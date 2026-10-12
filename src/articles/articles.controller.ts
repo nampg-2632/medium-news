@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -14,15 +22,43 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PreventCaching } from '../auth/decorators/prevent-caching.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
-import type { ArticleResponse } from './article.types';
+import type {
+  ArticleResponse,
+  MultipleArticlesResponse,
+} from './article.types';
 import { ArticlesService } from './articles.service';
-import { ArticleResponseDto } from './dto/article-response.dto';
+import {
+  ArticleResponseDto,
+  MultipleArticlesResponseDto,
+} from './dto/article-response.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
+import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
 
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
+
+  @Get()
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({
+    summary: 'List articles',
+    description:
+      'Most recent articles first, optionally filtered by tag, author or favorited. ' +
+      'Authentication is optional; when provided it is used to compute favorited and following. ' +
+      'The article body is not included.',
+  })
+  @ApiOkResponse({ type: MultipleArticlesResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Provided token is invalid' })
+  @ApiUnprocessableEntityResponse({ description: 'Invalid query parameters' })
+  @PreventCaching()
+  listArticles(
+    @Query() query: ListArticlesQueryDto,
+    @CurrentUser() authenticatedUser: AuthenticatedUser | undefined,
+  ): Promise<MultipleArticlesResponse> {
+    return this.articlesService.listArticles(query, authenticatedUser);
+  }
 
   @Get(':slug')
   @UseGuards(OptionalJwtAuthGuard)
