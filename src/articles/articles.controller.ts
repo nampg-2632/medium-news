@@ -162,4 +162,35 @@ export class ArticlesController {
   ): Promise<void> {
     return this.articlesService.deleteArticle(slug, authenticatedUser);
   }
+
+  @Post(':slug/favorite')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({ summary: 'Favorite an article' })
+  @ApiOkResponse({ type: ArticleResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @ApiNotFoundResponse({ description: 'Article not found' })
+  @PreventCaching()
+  favoriteArticle(
+    @Param('slug') slug: string,
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<ArticleResponse> {
+    return this.articlesService.favoriteArticle(slug, authenticatedUser);
+  }
+
+  @Delete(':slug/favorite')
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({ summary: 'Unfavorite an article' })
+  @ApiOkResponse({ type: ArticleResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @ApiNotFoundResponse({ description: 'Article not found' })
+  @PreventCaching()
+  unfavoriteArticle(
+    @Param('slug') slug: string,
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<ArticleResponse> {
+    return this.articlesService.unfavoriteArticle(slug, authenticatedUser);
+  }
 }

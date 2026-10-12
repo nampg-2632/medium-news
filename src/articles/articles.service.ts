@@ -136,6 +136,28 @@ export class ArticlesService {
     await this.articlesRepository.delete(article.id);
   }
 
+  async favoriteArticle(
+    slug: string,
+    viewer: AuthenticatedUser,
+  ): Promise<ArticleResponse> {
+    const article = await this.findArticle(slug);
+
+    await this.favoritesRepository.favorite(viewer.user.id, article.id);
+
+    return this.toArticleResponse(article, viewer);
+  }
+
+  async unfavoriteArticle(
+    slug: string,
+    viewer: AuthenticatedUser,
+  ): Promise<ArticleResponse> {
+    const article = await this.findArticle(slug);
+
+    await this.favoritesRepository.unfavorite(viewer.user.id, article.id);
+
+    return this.toArticleResponse(article, viewer);
+  }
+
   private async findArticles(
     filters: ArticleFilters,
     pagination: Pagination,

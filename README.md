@@ -115,6 +115,8 @@ GET    /api/articles/:slug               # authentication optional
 POST   /api/articles                     # title, description, body, optional tagList
 PUT    /api/articles/:slug               # author only; partial update, a new title regenerates the slug
 DELETE /api/articles/:slug               # author only; responds 204
+POST   /api/articles/:slug/favorite
+DELETE /api/articles/:slug/favorite
 ```
 
 List and feed responses omit the article `body`, as in the RealWorld spec.

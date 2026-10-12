@@ -10,6 +10,21 @@ export class FavoritesRepository {
     private readonly repository: Repository<FavoriteEntity>,
   ) {}
 
+  // ON CONFLICT DO NOTHING keeps favoriting idempotent under repeated requests.
+  async favorite(userId: string, articleId: string): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .insert()
+      .into(FavoriteEntity)
+      .values({ userId, articleId })
+      .orIgnore()
+      .execute();
+  }
+
+  async unfavorite(userId: string, articleId: string): Promise<void> {
+    await this.repository.delete({ userId, articleId });
+  }
+
   async countByArticleIds(articleIds: string[]): Promise<Map<string, number>> {
     if (articleIds.length === 0) {
       return new Map();
