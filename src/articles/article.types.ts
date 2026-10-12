@@ -28,6 +28,19 @@ export type UpdateArticleInput = {
   body?: string;
 };
 
+// Per-article data that depends on other tables or on the current viewer.
+export type ArticleViewerState = {
+  tagList: string[];
+  favorited: boolean;
+  favoritesCount: number;
+  following: boolean;
+};
+
+export type ArticleTagNameRow = {
+  articleId: string;
+  name: string;
+};
+
 export type ArticleData = {
   slug: string;
   title: string;

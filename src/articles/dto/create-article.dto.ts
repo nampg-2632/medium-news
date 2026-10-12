@@ -11,26 +11,24 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { isProvided } from '../../common/validation/is-provided';
-
-export const MAX_TAGS_PER_ARTICLE = 20;
-export const MAX_TAG_LENGTH = 50;
-
-export const trimString = ({ value }: { value: unknown }): unknown =>
-  typeof value === 'string' ? value.trim() : value;
-
-export const trimStrings = ({ value }: { value: unknown }): unknown =>
-  Array.isArray(value)
-    ? value.map((item: unknown) =>
-        typeof item === 'string' ? item.trim() : item,
-      )
-    : value;
+import { trimString, trimStrings } from '../../common/validation/trim';
+import {
+  MAX_TAG_LENGTH,
+  MAX_TAGS_PER_ARTICLE,
+  MAX_TITLE_LENGTH,
+} from '../article.constants';
 
 export class CreateArticleFieldsDto {
-  @ApiProperty({ example: 'How to train your dragon', maxLength: 255 })
+  @ApiProperty({
+    example: 'How to train your dragon',
+    maxLength: MAX_TITLE_LENGTH,
+  })
   @Transform(trimString)
   @IsString({ message: 'title must be a string' })
   @IsNotEmpty({ message: 'title cannot be empty' })
-  @MaxLength(255, { message: 'title must be at most 255 characters' })
+  @MaxLength(MAX_TITLE_LENGTH, {
+    message: `title must be at most ${MAX_TITLE_LENGTH} characters`,
+  })
   title!: string;
 
   @ApiProperty({ example: 'Ever wonder how?' })

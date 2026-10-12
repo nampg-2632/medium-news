@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, In, QueryFailedError, Repository } from 'typeorm';
+import { POSTGRES_UNIQUE_VIOLATION_CODE } from '../database/database.constants';
+import type { PostgresDriverError } from '../database/database.types';
 import { ArticleTagEntity } from '../tags/article-tag.entity';
 import { TagEntity } from '../tags/tag.entity';
 import { ArticleEntity } from './article.entity';
 import type {
   ArticleFilters,
+  ArticleTagNameRow,
   CreateArticleInput,
   Pagination,
   UpdateArticleInput,
 } from './article.types';
 import { ArticleSlugTakenError } from './articles.errors';
-
-const POSTGRES_UNIQUE_VIOLATION_CODE = '23505';
-
-type PostgresDriverError = Error & {
-  code?: string;
-  constraint?: string;
-};
 
 // Maps a unique violation on the slug to a domain error so the caller can
 // retry with another slug; any other error is returned unchanged.
@@ -186,7 +182,7 @@ export class ArticlesRepository {
       .addSelect('tag.name', 'name')
       .where('articleTag.articleId IN (:...articleIds)', { articleIds })
       .orderBy('tag.name', 'ASC')
-      .getRawMany<{ articleId: string; name: string }>();
+      .getRawMany<ArticleTagNameRow>();
 
     for (const row of rows) {
       const tagNames = tagNamesByArticleId.get(row.articleId) ?? [];

@@ -11,24 +11,26 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { isProvided } from '../../common/validation/is-provided';
+import { trimString, trimStrings } from '../../common/validation/trim';
 import {
   MAX_TAG_LENGTH,
   MAX_TAGS_PER_ARTICLE,
-  trimString,
-  trimStrings,
-} from './create-article.dto';
+  MAX_TITLE_LENGTH,
+} from '../article.constants';
 
 export class UpdateArticleFieldsDto {
   @ApiPropertyOptional({
     example: 'Did you train your dragon?',
-    maxLength: 255,
+    maxLength: MAX_TITLE_LENGTH,
     description: 'Changing the title also regenerates the slug',
   })
   @Transform(trimString)
   @ValidateIf(isProvided)
   @IsString({ message: 'title must be a string' })
   @IsNotEmpty({ message: 'title cannot be empty' })
-  @MaxLength(255, { message: 'title must be at most 255 characters' })
+  @MaxLength(MAX_TITLE_LENGTH, {
+    message: `title must be at most ${MAX_TITLE_LENGTH} characters`,
+  })
   title?: string;
 
   @ApiPropertyOptional({ example: 'Ever wonder how?' })

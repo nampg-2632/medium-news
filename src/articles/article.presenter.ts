@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UserPresenter } from '../users/user.presenter';
 import { ArticleEntity } from './article.entity';
-import type { ArticleData, ArticleListItem } from './article.types';
-
-export type ArticleViewerState = {
-  tagList: string[];
-  favorited: boolean;
-  favoritesCount: number;
-  following: boolean;
-};
+import type {
+  ArticleData,
+  ArticleListItem,
+  ArticleViewerState,
+} from './article.types';
 
 // Shapes articles for API responses. The article must be loaded with its
 // author and the author's avatar relation.

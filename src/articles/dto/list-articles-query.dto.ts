@@ -1,9 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-
-export const DEFAULT_ARTICLES_LIMIT = 20;
-export const MAX_ARTICLES_LIMIT = 100;
+import {
+  DEFAULT_ARTICLES_LIMIT,
+  DEFAULT_ARTICLES_OFFSET,
+  MAX_ARTICLES_LIMIT,
+} from '../article.constants';
 
 export class FeedArticlesQueryDto {
   @ApiPropertyOptional({
@@ -20,12 +22,12 @@ export class FeedArticlesQueryDto {
   })
   limit: number = DEFAULT_ARTICLES_LIMIT;
 
-  @ApiPropertyOptional({ default: 0, minimum: 0 })
+  @ApiPropertyOptional({ default: DEFAULT_ARTICLES_OFFSET, minimum: 0 })
   @IsOptional()
   @Type(() => Number)
   @IsInt({ message: 'offset must be an integer' })
   @Min(0, { message: 'offset must be at least 0' })
-  offset: number = 0;
+  offset: number = DEFAULT_ARTICLES_OFFSET;
 }
 
 export class ListArticlesQueryDto extends FeedArticlesQueryDto {

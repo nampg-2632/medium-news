@@ -1,16 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
+import { POSTGRES_UNIQUE_VIOLATION_CODE } from '../database/database.constants';
+import type { PostgresDriverError } from '../database/database.types';
 import { UserEntity } from './user.entity';
 import { CreateUserInput, UpdateUserInput } from './user.types';
 import { UserAlreadyExistsError } from './users.errors';
-
-const POSTGRES_UNIQUE_VIOLATION_CODE = '23505';
-
-type PostgresDriverError = Error & {
-  code?: string;
-  constraint?: string;
-};
 
 // Maps a unique-index violation on email/username to a domain error; any
 // other error is returned unchanged so the caller can rethrow it.

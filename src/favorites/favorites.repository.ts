@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { FavoriteEntity } from './favorite.entity';
+import type { FavoriteCountRow } from './favorite.types';
 
 @Injectable()
 export class FavoritesRepository {
@@ -36,7 +37,7 @@ export class FavoritesRepository {
       .addSelect('COUNT(*)::int', 'count')
       .where('favorite.articleId IN (:...articleIds)', { articleIds })
       .groupBy('favorite.articleId')
-      .getRawMany<{ articleId: string; count: number }>();
+      .getRawMany<FavoriteCountRow>();
 
     return new Map(rows.map((row) => [row.articleId, row.count]));
   }

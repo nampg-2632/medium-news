@@ -1,8 +1,5 @@
 import { randomBytes } from 'node:crypto';
-
-// Leaves room for the random suffix within the 255-character slug column.
-const MAX_BASE_SLUG_LENGTH = 200;
-const FALLBACK_SLUG = 'article';
+import { FALLBACK_SLUG, MAX_BASE_SLUG_LENGTH } from './article.constants';
 
 // Converts a title into a URL-safe slug, e.g. "Học NestJS!" -> "hoc-nestjs".
 export function slugify(title: string): string {

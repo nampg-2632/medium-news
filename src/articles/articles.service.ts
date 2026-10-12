@@ -7,12 +7,14 @@ import type { AuthenticatedUser } from '../auth/auth.types';
 import { createCustomError } from '../common/errors/custom-error';
 import { FavoritesRepository } from '../favorites/favorites.repository';
 import { FollowsRepository } from '../follows/follows.repository';
+import { MAX_SLUG_ATTEMPTS } from './article.constants';
 import { ArticleEntity } from './article.entity';
-import { ArticlePresenter, ArticleViewerState } from './article.presenter';
+import { ArticlePresenter } from './article.presenter';
 import { slugify, withRandomSuffix } from './article-slug';
 import type {
   ArticleFilters,
   ArticleResponse,
+  ArticleViewerState,
   MultipleArticlesResponse,
   Pagination,
   UpdateArticleInput,
@@ -25,9 +27,6 @@ import {
   ListArticlesQueryDto,
 } from './dto/list-articles-query.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-
-// Retries after a concurrent request claims the same slug first.
-const MAX_SLUG_ATTEMPTS = 3;
 
 @Injectable()
 export class ArticlesService {
