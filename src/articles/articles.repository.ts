@@ -122,6 +122,16 @@ export class ArticlesRepository {
       );
     }
 
+    if (filters.followerId !== undefined) {
+      query.andWhere(
+        `article.author_id IN (
+          SELECT follow.following_id FROM follows follow
+          WHERE follow.follower_id = :followerId
+        )`,
+        { followerId: filters.followerId },
+      );
+    }
+
     // Only many-to-one relations are joined, so offset/limit apply to
     // articles directly without duplicating rows.
     return query

@@ -110,11 +110,12 @@ avatar. Image URLs in responses are built from `APP_URL`.
 
 ```text
 GET    /api/articles                     # authentication optional; ?tag=&author=&favorited=&limit=20&offset=0
+GET    /api/articles/feed                # articles by followed users; ?limit=20&offset=0
 GET    /api/articles/:slug               # authentication optional
 POST   /api/articles                     # title, description, body, optional tagList
 ```
 
-List responses omit the article `body`, as in the RealWorld spec.
+List and feed responses omit the article `body`, as in the RealWorld spec.
 `limit` is capped at 100. Tags are stored in the shared `tags` table and linked
 through `article_tags`; `tagList` is returned in alphabetical order. Slugs are
 derived from the title and get a random suffix when already taken.

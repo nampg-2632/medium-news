@@ -15,7 +15,10 @@ import type {
 import { ArticleSlugTakenError } from './articles.errors';
 import { ArticlesRepository } from './articles.repository';
 import { CreateArticleDto } from './dto/create-article.dto';
-import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import {
+  FeedArticlesQueryDto,
+  ListArticlesQueryDto,
+} from './dto/list-articles-query.dto';
 
 // Retries after a concurrent request claims the same slug first.
 const MAX_SLUG_ATTEMPTS = 3;
@@ -37,6 +40,19 @@ export class ArticlesService {
 
     return this.findArticles(
       { tag, author, favorited },
+      { limit, offset },
+      viewer,
+    );
+  }
+
+  feedArticles(
+    query: FeedArticlesQueryDto,
+    viewer: AuthenticatedUser,
+  ): Promise<MultipleArticlesResponse> {
+    const { limit, offset } = query;
+
+    return this.findArticles(
+      { followerId: viewer.user.id },
       { limit, offset },
       viewer,
     );

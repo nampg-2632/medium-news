@@ -4,6 +4,8 @@ export type ArticleFilters = {
   tag?: string;
   author?: string;
   favorited?: string;
+  // Restricts results to authors followed by this user (feed).
+  followerId?: string;
 };
 
 export type Pagination = {

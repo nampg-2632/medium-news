@@ -32,7 +32,10 @@ import {
   MultipleArticlesResponseDto,
 } from './dto/article-response.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
-import { ListArticlesQueryDto } from './dto/list-articles-query.dto';
+import {
+  FeedArticlesQueryDto,
+  ListArticlesQueryDto,
+} from './dto/list-articles-query.dto';
 
 @ApiTags('Articles')
 @Controller('articles')
@@ -58,6 +61,26 @@ export class ArticlesController {
     @CurrentUser() authenticatedUser: AuthenticatedUser | undefined,
   ): Promise<MultipleArticlesResponse> {
     return this.articlesService.listArticles(query, authenticatedUser);
+  }
+
+  // Declared before ':slug' so "feed" is not treated as a slug.
+  @Get('feed')
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({
+    summary: 'Feed articles',
+    description:
+      'Most recent articles from followed users. The article body is not included.',
+  })
+  @ApiOkResponse({ type: MultipleArticlesResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @ApiUnprocessableEntityResponse({ description: 'Invalid query parameters' })
+  @PreventCaching()
+  feedArticles(
+    @Query() query: FeedArticlesQueryDto,
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<MultipleArticlesResponse> {
+    return this.articlesService.feedArticles(query, authenticatedUser);
   }
 
   @Get(':slug')
