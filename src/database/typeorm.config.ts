@@ -5,6 +5,8 @@ import { AttachmentEntity } from '../attachments/attachment.entity';
 import { CommentEntity } from '../comments/comment.entity';
 import { FavoriteEntity } from '../favorites/favorite.entity';
 import { FollowEntity } from '../follows/follow.entity';
+import { ArticleTagEntity } from '../tags/article-tag.entity';
+import { TagEntity } from '../tags/tag.entity';
 import { UserEntity } from '../users/user.entity';
 import { DatabaseConfigurationError } from './database.errors';
 
@@ -41,6 +43,8 @@ export function createTypeOrmOptions({
       CommentEntity,
       FavoriteEntity,
       FollowEntity,
+      TagEntity,
+      ArticleTagEntity,
     ],
     migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
     migrationsTableName: 'typeorm_migrations',

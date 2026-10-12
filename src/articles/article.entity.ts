@@ -12,6 +12,7 @@ import {
 import type { Relation } from 'typeorm';
 import { CommentEntity } from '../comments/comment.entity';
 import { FavoriteEntity } from '../favorites/favorite.entity';
+import { ArticleTagEntity } from '../tags/article-tag.entity';
 import { UserEntity } from '../users/user.entity';
 
 @Entity({ name: 'articles' })
@@ -53,4 +54,7 @@ export class ArticleEntity {
 
   @OneToMany(() => FavoriteEntity, (favorite) => favorite.article)
   favorites!: Relation<FavoriteEntity[]>;
+
+  @OneToMany(() => ArticleTagEntity, (articleTag) => articleTag.article)
+  articleTags!: Relation<ArticleTagEntity[]>;
 }
