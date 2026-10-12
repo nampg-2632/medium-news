@@ -21,6 +21,13 @@ export type CreateArticleInput = {
   authorId: string;
 };
 
+export type UpdateArticleInput = {
+  slug?: string;
+  title?: string;
+  description?: string;
+  body?: string;
+};
+
 export type ArticleData = {
   slug: string;
   title: string;

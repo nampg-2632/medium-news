@@ -8,6 +8,7 @@ import type {
   ArticleFilters,
   CreateArticleInput,
   Pagination,
+  UpdateArticleInput,
 } from './article.types';
 import { ArticleSlugTakenError } from './articles.errors';
 
@@ -54,6 +55,29 @@ export class ArticlesRepository {
       });
     } catch (error) {
       throw toArticleSlugTakenError(error, input.slug);
+    }
+  }
+
+  // tagNames replaces the article's tags when provided and is ignored when
+  // undefined.
+  async update(
+    id: string,
+    input: UpdateArticleInput,
+    tagNames: string[] | undefined,
+  ): Promise<void> {
+    try {
+      await this.repository.manager.transaction(async (manager) => {
+        if (Object.keys(input).length > 0) {
+          await manager.update(ArticleEntity, { id }, input);
+        }
+
+        if (tagNames !== undefined) {
+          await manager.delete(ArticleTagEntity, { articleId: id });
+          await this.attachTags(manager, id, tagNames);
+        }
+      });
+    } catch (error) {
+      throw toArticleSlugTakenError(error, input.slug ?? '');
     }
   }
 

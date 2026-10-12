@@ -4,11 +4,13 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -36,6 +38,7 @@ import {
   FeedArticlesQueryDto,
   ListArticlesQueryDto,
 } from './dto/list-articles-query.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 @ApiTags('Articles')
 @Controller('articles')
@@ -115,5 +118,27 @@ export class ArticlesController {
     @CurrentUser() authenticatedUser: AuthenticatedUser,
   ): Promise<ArticleResponse> {
     return this.articlesService.createArticle(dto, authenticatedUser);
+  }
+
+  @Put(':slug')
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({
+    summary: 'Update an article',
+    description:
+      'Only the provided fields are updated. Changing the title regenerates the slug.',
+  })
+  @ApiOkResponse({ type: ArticleResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @ApiForbiddenResponse({ description: 'Only the author can update' })
+  @ApiNotFoundResponse({ description: 'Article not found' })
+  @ApiUnprocessableEntityResponse({ description: 'Validation failed' })
+  @PreventCaching()
+  updateArticle(
+    @Param('slug') slug: string,
+    @Body() dto: UpdateArticleDto,
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<ArticleResponse> {
+    return this.articlesService.updateArticle(slug, dto, authenticatedUser);
   }
 }

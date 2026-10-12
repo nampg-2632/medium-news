@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { createCustomError } from '../common/errors/custom-error';
 import { FavoritesRepository } from '../favorites/favorites.repository';
@@ -11,6 +15,7 @@ import type {
   ArticleResponse,
   MultipleArticlesResponse,
   Pagination,
+  UpdateArticleInput,
 } from './article.types';
 import { ArticleSlugTakenError } from './articles.errors';
 import { ArticlesRepository } from './articles.repository';
@@ -19,6 +24,7 @@ import {
   FeedArticlesQueryDto,
   ListArticlesQueryDto,
 } from './dto/list-articles-query.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 // Retries after a concurrent request claims the same slug first.
 const MAX_SLUG_ATTEMPTS = 3;
@@ -81,6 +87,46 @@ export class ArticlesService {
     });
 
     return this.getArticle(slug, viewer);
+  }
+
+  async updateArticle(
+    slug: string,
+    dto: UpdateArticleDto,
+    viewer: AuthenticatedUser,
+  ): Promise<ArticleResponse> {
+    const article = await this.findArticle(slug);
+    this.assertAuthor(article, viewer, 'update');
+
+    const { title, description, body, tagList } = dto.article;
+    const input: UpdateArticleInput = {};
+
+    if (description !== undefined) {
+      input.description = description;
+    }
+    if (body !== undefined) {
+      input.body = body;
+    }
+
+    const tagNames =
+      tagList !== undefined ? this.normalizeTagList(tagList) : undefined;
+    let newSlug = article.slug;
+
+    if (title !== undefined && title !== article.title) {
+      newSlug = await this.writeWithUniqueSlug(
+        title,
+        (candidate) =>
+          this.articlesRepository.update(
+            article.id,
+            { ...input, title, slug: candidate },
+            tagNames,
+          ),
+        article.slug,
+      );
+    } else {
+      await this.articlesRepository.update(article.id, input, tagNames);
+    }
+
+    return this.getArticle(newSlug, viewer);
   }
 
   private async findArticles(
@@ -154,17 +200,32 @@ export class ArticlesService {
     return article;
   }
 
-  // Uses the plain title slug when it is free, otherwise a random suffix, and
-  // retries when a concurrent write claims the slug first. Returns the slug
-  // that was written.
+  private assertAuthor(
+    article: ArticleEntity,
+    viewer: AuthenticatedUser,
+    action: 'update',
+  ): void {
+    if (article.authorId !== viewer.user.id) {
+      throw new ForbiddenException(
+        createCustomError(`you are not allowed to ${action} this article`),
+      );
+    }
+  }
+
+  // Uses the plain title slug when it is free (or already owned by the
+  // article), otherwise a random suffix, and retries when a concurrent write
+  // claims the slug first. Returns the slug that was written.
   private async writeWithUniqueSlug(
     title: string,
     write: (slug: string) => Promise<void>,
+    currentSlug?: string,
   ): Promise<string> {
     const baseSlug = slugify(title);
-    let slug = (await this.articlesRepository.slugExists(baseSlug))
-      ? withRandomSuffix(baseSlug)
-      : baseSlug;
+    let slug =
+      baseSlug === currentSlug ||
+      !(await this.articlesRepository.slugExists(baseSlug))
+        ? baseSlug
+        : withRandomSuffix(baseSlug);
 
     for (let attempt = 1; ; attempt++) {
       try {

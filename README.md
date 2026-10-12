@@ -113,6 +113,7 @@ GET    /api/articles                     # authentication optional; ?tag=&author
 GET    /api/articles/feed                # articles by followed users; ?limit=20&offset=0
 GET    /api/articles/:slug               # authentication optional
 POST   /api/articles                     # title, description, body, optional tagList
+PUT    /api/articles/:slug               # author only; partial update, a new title regenerates the slug
 ```
 
 List and feed responses omit the article `body`, as in the RealWorld spec.
