@@ -109,6 +109,7 @@ avatar. Image URLs in responses are built from `APP_URL`.
 ## Articles
 
 ```text
+GET    /api/articles/:slug               # authentication optional
 POST   /api/articles                     # title, description, body, optional tagList
 ```
 

@@ -353,6 +353,26 @@
               }
             }
           ]
+        },
+        {
+          "name": "Get article",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "articles",
+                "{{articleSlug}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
         }
       ]
     }
