@@ -6,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { hash, verify } from 'argon2';
 import { createCustomError } from '../common/errors/custom-error';
+import { UserPresenter } from '../users/user.presenter';
 import { UserEntity } from '../users/user.entity';
 import { UserAlreadyExistsError } from '../users/users.errors';
 import { UsersRepository } from '../users/users.repository';
@@ -18,6 +19,7 @@ import { TokenBlacklistService } from './token-blacklist.service';
 export class AuthService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly userPresenter: UserPresenter,
     private readonly jwtService: JwtService,
     private readonly tokenBlacklistService: TokenBlacklistService,
   ) {}
@@ -82,7 +84,7 @@ export class AuthService {
         token,
         username: user.username,
         bio: user.bio,
-        image: user.image,
+        image: this.userPresenter.getImageUrl(user),
       },
     };
   }

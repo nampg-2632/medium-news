@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 import { DataSourceOptions } from 'typeorm';
 import { ArticleEntity } from '../articles/article.entity';
+import { AttachmentEntity } from '../attachments/attachment.entity';
 import { CommentEntity } from '../comments/comment.entity';
 import { FavoriteEntity } from '../favorites/favorite.entity';
 import { FollowEntity } from '../follows/follow.entity';
@@ -35,6 +36,7 @@ export function createTypeOrmOptions({
     url: databaseUrl,
     entities: [
       UserEntity,
+      AttachmentEntity,
       ArticleEntity,
       CommentEntity,
       FavoriteEntity,
