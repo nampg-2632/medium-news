@@ -9,6 +9,7 @@ import {
 } from 'nestjs-i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ArticlesModule } from './articles/articles.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { ProfilesModule } from './profiles/profiles.module';
@@ -23,6 +24,7 @@ import { ProfilesModule } from './profiles/profiles.module';
     DatabaseModule,
     AuthModule,
     ProfilesModule,
+    ArticlesModule,
     I18nModule.forRoot({
       fallbackLanguage: 'vi',
       fallbacks: {

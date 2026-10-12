@@ -29,6 +29,10 @@
     {
       "key": "profileUsername",
       "value": "bob"
+    },
+    {
+      "key": "articleSlug",
+      "value": ""
     }
   ],
   "auth": {
@@ -306,6 +310,49 @@
               ]
             }
           }
+        }
+      ]
+    },
+    {
+      "name": "Articles",
+      "item": [
+        {
+          "name": "Create article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"article\": {\n    \"title\": \"How to train your dragon\",\n    \"description\": \"Ever wonder how?\",\n    \"body\": \"You have to believe\",\n    \"tagList\": [\n      \"dragons\",\n      \"training\"\n    ]\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('articleSlug', pm.response.json().article.slug);",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     }

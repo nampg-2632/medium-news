@@ -106,6 +106,16 @@ Uploaded files are stored on local disk under `UPLOAD_DIR` (default
 the polymorphic `attachments` table and `users.avatar_id` references the current
 avatar. Image URLs in responses are built from `APP_URL`.
 
+## Articles
+
+```text
+POST   /api/articles                     # title, description, body, optional tagList
+```
+
+Tags are stored in the shared `tags` table and linked through `article_tags`;
+`tagList` is returned in alphabetical order. Slugs are derived from the title
+and get a random suffix when already taken.
+
 ## Compile and run the project
 
 ```bash
