@@ -129,6 +129,13 @@ export class ArticlesService {
     return this.getArticle(newSlug, viewer);
   }
 
+  async deleteArticle(slug: string, viewer: AuthenticatedUser): Promise<void> {
+    const article = await this.findArticle(slug);
+    this.assertAuthor(article, viewer, 'delete');
+
+    await this.articlesRepository.delete(article.id);
+  }
+
   private async findArticles(
     filters: ArticleFilters,
     pagination: Pagination,
@@ -203,7 +210,7 @@ export class ArticlesService {
   private assertAuthor(
     article: ArticleEntity,
     viewer: AuthenticatedUser,
-    action: 'update',
+    action: 'update' | 'delete',
   ): void {
     if (article.authorId !== viewer.user.id) {
       throw new ForbiddenException(

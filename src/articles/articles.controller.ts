@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -11,6 +14,7 @@ import {
 import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -140,5 +144,22 @@ export class ArticlesController {
     @CurrentUser() authenticatedUser: AuthenticatedUser,
   ): Promise<ArticleResponse> {
     return this.articlesService.updateArticle(slug, dto, authenticatedUser);
+  }
+
+  @Delete(':slug')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({ summary: 'Delete an article' })
+  @ApiNoContentResponse({ description: 'Article deleted' })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @ApiForbiddenResponse({ description: 'Only the author can delete' })
+  @ApiNotFoundResponse({ description: 'Article not found' })
+  @PreventCaching()
+  deleteArticle(
+    @Param('slug') slug: string,
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<void> {
+    return this.articlesService.deleteArticle(slug, authenticatedUser);
   }
 }

@@ -81,6 +81,10 @@ export class ArticlesRepository {
     }
   }
 
+  async delete(id: string): Promise<void> {
+    await this.repository.delete({ id });
+  }
+
   slugExists(slug: string): Promise<boolean> {
     return this.repository.existsBy({ slug });
   }
