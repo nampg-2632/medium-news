@@ -11,18 +11,14 @@ import { AttachmentEntity } from '../attachments/attachment.entity';
 import { detectImage } from '../attachments/image-signature';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { createCustomError } from '../common/errors/custom-error';
+import {
+  AVATAR_DIRECTORY,
+  MAX_FILE_NAME_LENGTH,
+} from './user-avatar.constants';
 import { UserPresenter } from './user.presenter';
 import { UserEntity } from './user.entity';
-import type { UserResponse } from './user.types';
+import type { NewAvatar, UserResponse } from './user.types';
 import { UsersRepository } from './users.repository';
-
-const AVATAR_DIRECTORY = 'avatars';
-const MAX_FILE_NAME_LENGTH = 255;
-
-type NewAvatar = Pick<
-  AttachmentEntity,
-  'fileName' | 'storagePath' | 'url' | 'fileType' | 'fileSize'
->;
 
 @Injectable()
 export class UserAvatarService {

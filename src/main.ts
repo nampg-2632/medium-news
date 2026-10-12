@@ -4,10 +4,8 @@ import type { ServerResponse } from 'node:http';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import {
-  AttachmentStorageService,
-  PUBLIC_UPLOADS_PREFIX,
-} from './attachments/attachment-storage.service';
+import { AttachmentStorageService } from './attachments/attachment-storage.service';
+import { PUBLIC_UPLOADS_PREFIX } from './attachments/attachment.constants';
 import { createValidationException } from './common/validation/create-validation-exception';
 
 async function bootstrap() {

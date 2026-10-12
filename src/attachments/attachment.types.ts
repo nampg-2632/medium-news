@@ -8,3 +8,8 @@ export type StoredFile = {
   storagePath: string;
   url: string;
 };
+
+export type DetectedImage = {
+  mimeType: string;
+  extension: string;
+};

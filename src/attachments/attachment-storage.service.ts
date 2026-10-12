@@ -3,9 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve, sep } from 'node:path';
+import {
+  DEFAULT_UPLOAD_DIR,
+  PUBLIC_UPLOADS_PREFIX,
+} from './attachment.constants';
 import type { StoredFile } from './attachment.types';
-
-export const PUBLIC_UPLOADS_PREFIX = '/uploads';
 
 @Injectable()
 export class AttachmentStorageService {
@@ -15,7 +17,7 @@ export class AttachmentStorageService {
 
   constructor(configService: ConfigService) {
     this.rootDir = resolve(
-      configService.get<string>('UPLOAD_DIR') ?? 'storage/uploads',
+      configService.get<string>('UPLOAD_DIR') ?? DEFAULT_UPLOAD_DIR,
     );
     this.baseUrl = (
       configService.get<string>('APP_URL') ??

@@ -11,11 +11,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-
-// A missing field means "no change". @IsOptional() is not used because it
-// also skips null, which would let { "email": null } through validation.
-const isProvided = (_object: object, value: unknown): boolean =>
-  value !== undefined;
+import { isProvided } from '../../common/validation/is-provided';
 
 export class UpdateUserFieldsDto {
   @ApiPropertyOptional({ example: 'user@example.com' })

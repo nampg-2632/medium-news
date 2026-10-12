@@ -26,11 +26,10 @@ import { PreventCaching } from '../auth/decorators/prevent-caching.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
+import { AVATAR_MAX_SIZE_BYTES } from './user-avatar.constants';
 import { UserAvatarService } from './user-avatar.service';
 import type { UserResponse } from './user.types';
 import { UsersService } from './users.service';
-
-const AVATAR_MAX_SIZE_BYTES = 2 * 1024 * 1024;
 
 @ApiTags('Users')
 @Controller()
