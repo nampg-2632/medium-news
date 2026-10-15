@@ -16,6 +16,20 @@ export class CommentsRepository {
     return this.repository.save(this.repository.create(input));
   }
 
+  async delete(id: string): Promise<void> {
+    await this.repository.delete({ id });
+  }
+
+  findByIdInArticle(
+    id: string,
+    articleId: string,
+  ): Promise<CommentEntity | null> {
+    return this.repository.findOne({
+      select: { id: true, authorId: true },
+      where: { id, articleId },
+    });
+  }
+
   // Oldest first, matching the comments_article_created_at_idx index.
   findByArticleId(articleId: string): Promise<CommentEntity[]> {
     return this.repository

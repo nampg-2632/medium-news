@@ -119,6 +119,7 @@ POST   /api/articles/:slug/favorite
 DELETE /api/articles/:slug/favorite
 GET    /api/articles/:slug/comments      # authentication optional; oldest first
 POST   /api/articles/:slug/comments      # body
+DELETE /api/articles/:slug/comments/:id  # comment author only; responds 204
 ```
 
 List and feed responses omit the article `body`, as in the RealWorld spec.

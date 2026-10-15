@@ -1,6 +1,18 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -24,6 +36,7 @@ import {
   MultipleCommentsResponseDto,
 } from './dto/comment-response.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { ParseCommentIdPipe } from './pipes/parse-comment-id.pipe';
 
 @ApiTags('Comments')
 @Controller('articles/:slug/comments')
@@ -64,5 +77,23 @@ export class CommentsController {
     @CurrentUser() authenticatedUser: AuthenticatedUser,
   ): Promise<CommentResponse> {
     return this.commentsService.addComment(slug, dto, authenticatedUser);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('token')
+  @ApiOperation({ summary: 'Delete a comment' })
+  @ApiNoContentResponse({ description: 'Comment deleted' })
+  @ApiUnauthorizedResponse({ description: 'Authentication is required' })
+  @ApiForbiddenResponse({ description: 'Only the comment author can delete' })
+  @ApiNotFoundResponse({ description: 'Article or comment not found' })
+  @PreventCaching()
+  deleteComment(
+    @Param('slug') slug: string,
+    @Param('id', ParseCommentIdPipe) id: string,
+    @CurrentUser() authenticatedUser: AuthenticatedUser,
+  ): Promise<void> {
+    return this.commentsService.deleteComment(slug, id, authenticatedUser);
   }
 }

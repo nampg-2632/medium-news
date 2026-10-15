@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ArticlesRepository } from '../articles/articles.repository';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { createCustomError } from '../common/errors/custom-error';
@@ -60,6 +64,30 @@ export class CommentsService {
         ),
       ),
     };
+  }
+
+  async deleteComment(
+    slug: string,
+    id: string,
+    viewer: AuthenticatedUser,
+  ): Promise<void> {
+    const articleId = await this.findArticleId(slug);
+    const comment = await this.commentsRepository.findByIdInArticle(
+      id,
+      articleId,
+    );
+
+    if (!comment) {
+      throw new NotFoundException(createCustomError('comment not found'));
+    }
+
+    if (comment.authorId !== viewer.user.id) {
+      throw new ForbiddenException(
+        createCustomError('you are not allowed to delete this comment'),
+      );
+    }
+
+    await this.commentsRepository.delete(comment.id);
   }
 
   private async findArticleId(slug: string): Promise<string> {
