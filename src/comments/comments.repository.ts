@@ -15,4 +15,18 @@ export class CommentsRepository {
   create(input: CreateCommentInput): Promise<CommentEntity> {
     return this.repository.save(this.repository.create(input));
   }
+
+  // Oldest first, matching the comments_article_created_at_idx index.
+  findByArticleId(articleId: string): Promise<CommentEntity[]> {
+    return this.repository
+      .createQueryBuilder('comment')
+      .innerJoin('comment.author', 'author')
+      .addSelect(['author.id', 'author.username', 'author.bio'])
+      .leftJoin('author.avatar', 'avatar')
+      .addSelect(['avatar.id', 'avatar.url'])
+      .where('comment.articleId = :articleId', { articleId })
+      .orderBy('comment.createdAt', 'ASC')
+      .addOrderBy('comment.id', 'ASC')
+      .getMany();
+  }
 }

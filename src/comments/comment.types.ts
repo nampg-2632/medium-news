@@ -17,3 +17,7 @@ export type CommentData = {
 export type CommentResponse = {
   comment: CommentData;
 };
+
+export type MultipleCommentsResponse = {
+  comments: CommentData[];
+};

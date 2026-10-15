@@ -528,6 +528,24 @@
       "name": "Comments",
       "item": [
         {
+          "name": "Get comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleSlug}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "articles",
+                "{{articleSlug}}",
+                "comments"
+              ]
+            }
+          }
+        },
+        {
           "name": "Add comment",
           "request": {
             "method": "POST",

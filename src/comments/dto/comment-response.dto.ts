@@ -22,3 +22,8 @@ export class CommentResponseDto {
   @ApiProperty({ type: CommentDto })
   comment!: CommentDto;
 }
+
+export class MultipleCommentsResponseDto {
+  @ApiProperty({ type: [CommentDto] })
+  comments!: CommentDto[];
+}

@@ -117,6 +117,7 @@ PUT    /api/articles/:slug               # author only; partial update, a new ti
 DELETE /api/articles/:slug               # author only; responds 204
 POST   /api/articles/:slug/favorite
 DELETE /api/articles/:slug/favorite
+GET    /api/articles/:slug/comments      # authentication optional; oldest first
 POST   /api/articles/:slug/comments      # body
 ```
 

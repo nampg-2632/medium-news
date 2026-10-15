@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArticlesModule } from '../articles/articles.module';
+import { FollowsModule } from '../follows/follows.module';
 import { UsersModule } from '../users/users.module';
 import { CommentEntity } from './comment.entity';
 import { CommentPresenter } from './comment.presenter';
@@ -12,6 +13,7 @@ import { CommentsService } from './comments.service';
   imports: [
     TypeOrmModule.forFeature([CommentEntity]),
     ArticlesModule,
+    FollowsModule,
     UsersModule,
   ],
   controllers: [CommentsController],
