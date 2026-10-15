@@ -106,6 +106,24 @@ Uploaded files are stored on local disk under `UPLOAD_DIR` (default
 the polymorphic `attachments` table and `users.avatar_id` references the current
 avatar. Image URLs in responses are built from `APP_URL`.
 
+## Articles
+
+```text
+GET    /api/articles                     # authentication optional; ?tag=&author=&favorited=&limit=20&offset=0
+GET    /api/articles/feed                # articles by followed users; ?limit=20&offset=0
+GET    /api/articles/:slug               # authentication optional
+POST   /api/articles                     # title, description, body, optional tagList
+PUT    /api/articles/:slug               # author only; partial update, a new title regenerates the slug
+DELETE /api/articles/:slug               # author only; responds 204
+POST   /api/articles/:slug/favorite
+DELETE /api/articles/:slug/favorite
+```
+
+List and feed responses omit the article `body`, as in the RealWorld spec.
+`limit` is capped at 100. Tags are stored in the shared `tags` table and linked
+through `article_tags`; `tagList` is returned in alphabetical order. Slugs are
+derived from the title and get a random suffix when already taken.
+
 ## Compile and run the project
 
 ```bash
