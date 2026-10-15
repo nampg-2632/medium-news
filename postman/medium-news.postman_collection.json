@@ -523,6 +523,38 @@
           }
         }
       ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Add comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/{{articleSlug}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "articles",
+                "{{articleSlug}}",
+                "comments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": {\n    \"body\": \"Thank you so much!\"\n  }\n}"
+            }
+          }
+        }
+      ]
     }
   ]
 }

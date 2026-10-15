@@ -85,6 +85,15 @@ export class ArticlesRepository {
     return this.repository.existsBy({ slug });
   }
 
+  async findIdBySlug(slug: string): Promise<string | null> {
+    const article = await this.repository.findOne({
+      select: { id: true },
+      where: { slug },
+    });
+
+    return article?.id ?? null;
+  }
+
   findBySlug(slug: string): Promise<ArticleEntity | null> {
     return this.repository
       .createQueryBuilder('article')
