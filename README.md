@@ -117,12 +117,18 @@ PUT    /api/articles/:slug               # author only; partial update, a new ti
 DELETE /api/articles/:slug               # author only; responds 204
 POST   /api/articles/:slug/favorite
 DELETE /api/articles/:slug/favorite
+GET    /api/articles/:slug/comments      # authentication optional; oldest first
+POST   /api/articles/:slug/comments      # body
+DELETE /api/articles/:slug/comments/:id  # comment author only; responds 204
 ```
 
 List and feed responses omit the article `body`, as in the RealWorld spec.
 `limit` is capped at 100. Tags are stored in the shared `tags` table and linked
 through `article_tags`; `tagList` is returned in alphabetical order. Slugs are
 derived from the title and get a random suffix when already taken.
+
+Comments cannot be edited, so a comment's `updatedAt` always equals its
+`createdAt`.
 
 ## Compile and run the project
 
